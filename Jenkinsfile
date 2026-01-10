@@ -1,10 +1,14 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.9.3-eclipse-temurin-21'
+        }
+    }
 
     stages {
         stage('Checkout') {
             steps {
-                git url: ' https://github.com/MeryemeLarhzali/CI-CD_Project.git', branch: 'main'
+                git url: 'https://github.com/MeryemeLarhzali/CI-CD_Project.git', branch: 'main'
             }
         }
 
@@ -34,11 +38,7 @@ pipeline {
     }
 
     post {
-        success {
-            echo 'Build et tests réussis !'
-        }
-        failure {
-            echo 'Le build ou les tests ont échoué.'
-        }
+        success { echo 'Build et tests réussis !' }
+        failure { echo 'Le build ou les tests ont échoué.' }
     }
 }
