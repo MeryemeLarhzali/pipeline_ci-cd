@@ -8,18 +8,18 @@ pipeline {
 
     stages {
         stage('Clean Workspace') {
-            steps {
-                echo 'Nettoyage du workspace...'
-                deleteDir()
-            }
-        }
+    steps {
+        deleteDir()
+    }
+}
+
 
         stage('Checkout') {
-            steps {
-                echo 'Récupération du code depuis Git...'
-                git branch: 'main', url: 'https://github.com/MeryemeLarhzali/CI-CD_Project.git'
-            }
-        }
+    steps {
+        git branch: 'main', url: 'https://github.com/MeryemeLarhzali/CI-CD_Project.git'
+    }
+}
+
 
         stage('Build') {
             steps {
