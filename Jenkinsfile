@@ -1,7 +1,11 @@
 pipeline {
     agent {
-        docker { image 'maven:3.9.2-eclipse-temurin-21' } // Maven + Java 21 inclus
+    docker {
+        image 'maven:3.9.2-eclipse-temurin-21'
+        label 'docker'
     }
+}
+
 
     stages {
         stage('Checkout') {
