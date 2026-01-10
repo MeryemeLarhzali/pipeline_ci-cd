@@ -1,34 +1,67 @@
 pipeline {
-     agent {
-        docker {
-            image 'maven:3.9.0-eclipse-temurin-21'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
+    agent any
+
+    tools {
+        maven 'MavenDefault'  // Configuré dans Jenkins → Global Tool Configuration
+        jdk 'JavaDefault'     // Configuré dans Jenkins → Global Tool Configuration
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                echo 'Nettoyage du workspace...'
+                deleteDir()
+            }
+        }
+
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/MeryemeLarhzali/CI-CD_Project.git', branch: 'main'
+                echo 'Récupération du code depuis Git...'
+                git branch: 'main', url: 'https://github.com/MeryemeLarhzali/CI-CD_Project.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Compilation du projet...'
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Exécution des tests...'
+                sh 'mvn test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo 'Packaging du projet...'
+                sh 'mvn package'
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                echo 'Archivage du JAR...'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
 
         stage('Docker Build & Run') {
             steps {
-                echo "Build et lancement Docker..."
+                echo 'Build et lancement Docker...'
                 sh '''
+                    # Construire l'image Docker
+                    docker build -t gestion-produits:latest .
+
                     # Stopper et supprimer l'ancien conteneur s'il existe
                     docker stop gestion-produits || true
                     docker rm gestion-produits || true
 
-                    # Construire l'image Docker (Maven inclus via Dockerfile multi-stage)
-                    docker build -t gestion-produits:latest .
-
-                    # Lancer le conteneur avec mapping de port correct
+                    # Lancer le conteneur
                     docker run -d -p 8081:8085 --name gestion-produits gestion-produits:latest
-
-                    # Vérifier les conteneurs en cours
-                    docker ps
                 '''
             }
         }
@@ -36,10 +69,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline terminée : application accessible sur http://localhost:8081'
+            echo 'Build, tests et déploiement Docker réussis !'
         }
         failure {
-            echo 'Échec du build ou du déploiement Docker.'
+            echo 'Échec du build, des tests ou du déploiement Docker.'
         }
     }
 }
