@@ -36,6 +36,17 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
+        stage('Docker Build & Run') {
+            steps {
+                sh '''
+                    docker build -t ci_cd:latest .
+                    docker stop ci_cd || true
+                    docker rm ci_cd || true
+                    docker run -d -p 8080:8080 --name ci_cd ci_cd:latest
+                '''
+            }
+        }
+
     }
 
     post {
