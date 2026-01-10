@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'MavenDefault'  // doit être configuré dans Jenkins → Global Tool Configuration
-        jdk 'JavaDefault'     // doit être configuré dans Jenkins → Global Tool Configuration
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -13,44 +8,33 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                sh 'mvn clean compile'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-
-        stage('Package') {
-            steps {
-                sh 'mvn package'
-            }
-        }
-
-        stage('Archive') {
-            steps {
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            }
-        }
         stage('Docker Build & Run') {
             steps {
+                echo "Build et lancement Docker..."
                 sh '''
-                    docker build -t ci_cd:latest .
-                    docker stop ci_cd || true
-                    docker rm ci_cd || true
-                    docker run -d -p 8080:8080 --name ci_cd ci_cd:latest
+                    # Stopper et supprimer l'ancien conteneur s'il existe
+                    docker stop gestion-produits || true
+                    docker rm gestion-produits || true
+
+                    # Construire l'image Docker (Maven inclus via Dockerfile multi-stage)
+                    docker build -t gestion-produits:latest .
+
+                    # Lancer le conteneur avec mapping de port correct
+                    docker run -d -p 8081:8085 --name gestion-produits gestion-produits:latest
+
+                    # Vérifier les conteneurs en cours
+                    docker ps
                 '''
             }
         }
-
     }
 
     post {
-        success { echo 'Build et tests réussis !' }
-        failure { echo 'Le build ou les tests ont échoué.' }
+        success {
+            echo 'Pipeline terminée : application accessible sur http://localhost:8081'
+        }
+        failure {
+            echo 'Échec du build ou du déploiement Docker.'
+        }
     }
 }
