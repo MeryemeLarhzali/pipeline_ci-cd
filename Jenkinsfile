@@ -1,11 +1,10 @@
 pipeline {
-    agent {
-    docker {
-        image 'maven:3.9.2-eclipse-temurin-21'
-        label 'docker'
-    }
-}
+    agent any
 
+    tools {
+        maven 'MavenDefault'  // doit être configuré dans Jenkins → Global Tool Configuration
+        jdk 'JavaDefault'     // doit être configuré dans Jenkins → Global Tool Configuration
+    }
 
     stages {
         stage('Checkout') {
