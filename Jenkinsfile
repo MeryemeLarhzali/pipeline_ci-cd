@@ -8,18 +8,18 @@ pipeline {
 
     stages {
         stage('Clean Workspace') {
-    steps {
-        deleteDir()
-    }
-}
-
+            steps {
+                echo 'Nettoyage du workspace...'
+                deleteDir() // Supprime tout le contenu du workspace
+            }
+        }
 
         stage('Checkout') {
-    steps {
-        git branch: 'main', url: 'https://github.com/MeryemeLarhzali/CI-CD_Project.git'
-    }
-}
-
+            steps {
+                echo 'Récupération du code source...'
+                checkout scm // Utilise le repo et la branche qui ont fourni le Jenkinsfile
+            }
+        }
 
         stage('Build') {
             steps {
