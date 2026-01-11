@@ -6,8 +6,8 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "app-gestion-produits"
-        CONTAINER_NAME = "app-gestion-produits-container"
+        IMAGE_NAME = "tp-spring-boot"
+        CONTAINER_NAME = "tp-spring-boot-container"
     }
 
     stages {
