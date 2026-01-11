@@ -30,19 +30,5 @@ pipeline {
                 sh 'mvn package'
             }
         }
-
-        stage('Deployement') {
-            steps {
-                echo 'Déploiement avec Docker...'
-                sh '''
-                # Nouveau nom d'image et de conteneur
-                docker build -t gestion_produits_image:latest .
-                docker stop gestion_produits_container || true
-                docker rm gestion_produits_container || true
-                docker run -d -p 8080:8080 --name gestion_produits_container gestion_produits_image:latest
-                '''
-            }
-        }
-
     }
 }
