@@ -9,9 +9,10 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo 'Clonage du code'
+                git branch: 'main', url: 'https://github.com/MeryemeLarhzali/pipeline_ci-cd.git'
             }
         }
+
 
         stage('Build') {
             steps {
